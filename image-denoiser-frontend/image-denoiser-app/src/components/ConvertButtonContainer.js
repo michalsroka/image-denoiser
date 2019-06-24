@@ -4,7 +4,9 @@ import { Button } from "react-bootstrap";
 const ConvertButtonContainer = props => {
   return (
     <div>
-      <Button variant="primary">ConvertButtonContainer</Button>
+      <Button variant="primary" onClick={props.onClick}>
+        Remove the noise
+      </Button>
     </div>
   );
 };

@@ -4,7 +4,7 @@ const ResultContainer = props => {
 
     return (
         <div>
-            Result container
+            Result
         </div>
     );
 }
