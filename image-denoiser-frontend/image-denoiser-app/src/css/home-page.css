@@ -1,0 +1,13 @@
+.left-column {
+    flex: 35%;
+    background-color: #aaa;
+}
+
+.middle-column {
+    flex: 20%;
+}
+
+.right-column {
+    flex: 35%;
+    background-color: #aaa;
+}
