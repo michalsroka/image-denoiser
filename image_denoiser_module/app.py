@@ -6,10 +6,11 @@ from flask import json
 
 import image_denoiser_model.model as tf_model
 
-PRETRAINED_PATH = os.environ['PRETRAINED_PATH'] if 'PRETRAINED_PATH' in os.environ else os.path.join('..',
-                                                                                                     'image_denoiser_model',
-                                                                                                     'pretrained',
-                                                                                                     'model.h5')
+PRETRAINED_PATH = os.environ['PRETRAINED_PATH'] if 'PRETRAINED_PATH' in os.environ else os.path.join(
+    '..',
+    'image_denoiser_model',
+    'pretrained',
+    'model.h5')
 PORT = os.environ['PORT'] if 'PORT' in os.environ else 8080
 
 app = flask.Flask(__name__)

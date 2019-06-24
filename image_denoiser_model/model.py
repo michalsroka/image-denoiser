@@ -1,5 +1,6 @@
 import tensorflow as tf
 
+
 class Denoiser:
     def __init__(self, pretrained_path):
         self.model = tf.keras.models.load_model(pretrained_path)
