@@ -2,6 +2,7 @@ import os.path
 
 import flask
 import numpy as np
+from flask import json
 
 import image_denoiser_model.model as tf_model
 
@@ -25,18 +26,33 @@ def get_model():
 
 def _parse__predict_request():
     query = flask.request.get_json(silent=True)
-    return np.array(query['images'])
+    image = np.array(query['images']['img'])
+    assert image.shape == (1, 48, 48, 3) or image.shape == (48, 48, 3), 'Image shape is not (1, 48, 48, 3)'
+    return image
 
 
 @app.route('/predict', methods=['POST'])
 def predict():
-    images = _parse__predict_request().reshape(-1, 48, 48, 3)
-    model = get_model()
-    preds = model.predict(images).reshape(-1, 48, 48, 3).tolist()
-    response = {'images': preds}
+    try:
+        images = _parse__predict_request()
+        model = get_model()
+        preds = np.array(model.predict(images)).reshape(48, 48, 3).tolist()
 
-    return flask.jsonify(response)
+        response = app.response_class(
+            response=json.dumps({'images': preds}),
+            status=200,
+            mimetype='application/json'
+        )
+
+    except Exception as e:
+        err_msg = f'Expected json format {{images: {{img: []}} }}, Python ex message: {e}'
+        response = app.response_class(
+            response=json.dumps({'err': err_msg}),
+            status=400,
+            mimetype='application/json'
+        )
+    return response
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=PORT)
+    app.run(host='0.0.0.0', port=PORT, threaded=False)

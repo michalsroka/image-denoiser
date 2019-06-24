@@ -7,5 +7,6 @@ class Denoiser:
 
     def predict(self, inputs):
         with self.graph.as_default():
-            predictions = self.model.predict(inputs)
-            return predictions
+            x = inputs.reshape(1, 48, 48, 3)
+            predictions = self.model.predict(x)
+            return predictions.reshape(48, 48, 3)
