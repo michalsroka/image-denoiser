@@ -6,12 +6,13 @@ import HomePage from "./pages/HomePage";
 
 class App extends Component {
   prepareAxiosDefaults() {
-    Axios.defaults.baseURL = "http://localhost:8080";
+    Axios.defaults.baseURL = "http://localhost:5000";
     Axios.defaults.headers.common["Content-Type"] =
       "application/json;charset=utf-8";
   }
 
   render() {
+    this.prepareAxiosDefaults();
     return (
       <Router>
         <div className="container main">

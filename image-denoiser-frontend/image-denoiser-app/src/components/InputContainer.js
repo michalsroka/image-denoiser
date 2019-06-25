@@ -1,5 +1,6 @@
 import React from "react";
 import ImageContainer from "./ImageContainer";
+import ValueInput from "./ValueInput";
 import "../css/input-container.css";
 
 const InputContainer = props => {

@@ -3,7 +3,7 @@ import "../css/image-container.css";
 
 const ImageContainer = props => {
   const content = props.image ? (
-    <img src={props.image} />
+    <img id={props.id} src={props.image} />
   ) : (
     <input type="file" onChange={props.handleChange} />
   );
