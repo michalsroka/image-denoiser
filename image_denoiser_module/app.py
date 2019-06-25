@@ -3,8 +3,10 @@ import os.path
 import flask
 import numpy as np
 from flask import json
+from flask_cors import CORS
 
 import image_denoiser_model.model as tf_model
+import image_denoiser_service.handlers as handlers
 
 PRETRAINED_PATH = os.environ['PRETRAINED_PATH'] if 'PRETRAINED_PATH' in os.environ else os.path.join(
     '..',
@@ -14,6 +16,8 @@ PRETRAINED_PATH = os.environ['PRETRAINED_PATH'] if 'PRETRAINED_PATH' in os.envir
 PORT = os.environ['PORT'] if 'PORT' in os.environ else 8080
 
 app = flask.Flask(__name__)
+
+CORS(app)
 
 
 def get_model():
@@ -26,18 +30,28 @@ def get_model():
 
 
 def _parse__predict_request():
-    query = flask.request.get_json(silent=True)
-    image = np.array(query['images']['img'])
-    assert image.shape == (1, 48, 48, 3) or image.shape == (48, 48, 3), 'Image shape is not (1, 48, 48, 3)'
-    return image
+    query = flask.request.get_json(silent=False)
+    query['images']['img'] = np.array(query['images']['img'])
+
+    if 'label' in query['images']:
+        query['images']['label'] = np.array(query['images']['label'])
+
+    assert query['images']['img'].shape == (1, 48, 48, 3) or query['images']['img'].shape == (
+        48, 48, 3), 'Image shape is not (1, 48, 48, 3)'
+
+    return query
 
 
 @app.route('/predict', methods=['POST'])
 def predict():
     try:
-        images = _parse__predict_request()
+        query = _parse__predict_request()
+
+        for handler in handlers.mongo_handlers:
+            handler(query)
+
         model = get_model()
-        preds = np.array(model.predict(images)).reshape(48, 48, 3).tolist()
+        preds = np.rint((np.array(model.predict(query['images']['img'] / 255.)).reshape(48, 48, 3) * 255)).tolist()
 
         response = app.response_class(
             response=json.dumps({'images': preds}),
