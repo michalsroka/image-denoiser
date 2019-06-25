@@ -77,12 +77,10 @@ class HomePage extends Component {
     let config = { headers: { "Content-Type": "application/json" } };
     let body = this.prepareData(imgData); // TODO: change
     console.log(body);
-    this.drawDenoised(imgData);
     Axios.post("/predict", body, config)
       .then(results => {
-        console.log("LALA");
-        let response = JSON.stringify(imgData);
-
+        let responseImageData = results.data.images;
+        this.drawDenoised(responseImageData);
         this.props.history.push("/");
       })
       .catch(error => {
@@ -120,8 +118,8 @@ class HomePage extends Component {
     let body = {};
     body.username = this.state.username;
     body.images = {};
-    body.images.img = JSON.stringify(imgData);
-    body.images.label = JSON.stringify(imgData);
+    body.images.img = imgData;
+    body.images.label = imgData;
     return body;
   }
 
