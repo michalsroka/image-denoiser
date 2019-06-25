@@ -1,0 +1,19 @@
+.left-column {
+    min-height: 300px;
+    flex: 35%;
+    background-color: rgba(131, 204, 109, 0.459);
+    border-radius: 20px;
+    border: 5px solid rgba(131, 204, 109, 0.459);
+}
+
+.middle-column {
+    flex: 20%;
+}
+
+.right-column {
+    min-height: 300px;
+    flex: 35%;
+    background-color: rgba(187, 68, 68, 0.493);
+    border-radius: 20px;
+    border: 5px solid rgba(187, 68, 68, 0.493);
+}
