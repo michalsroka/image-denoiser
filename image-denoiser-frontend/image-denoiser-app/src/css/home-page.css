@@ -8,6 +8,7 @@
 
 .middle-column {
     flex: 20%;
+    flex-direction: column;
 }
 
 .right-column {

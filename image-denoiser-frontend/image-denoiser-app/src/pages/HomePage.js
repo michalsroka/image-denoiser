@@ -16,6 +16,7 @@ class HomePage extends Component {
       label_url: null,
       denoised_image: null,
       image: null,
+      label_image: null,
       username: ""
     };
     // this.getArrayFromImage = this.getArrayFromImage.bind(this);
@@ -27,6 +28,7 @@ class HomePage extends Component {
       label_url: this.state.label_url,
       denoised_image: this.state.denoised_image,
       image: this.state.image,
+      label_image: this.state.label_image,
       username: event.target.value
     });
   }
@@ -39,25 +41,36 @@ class HomePage extends Component {
       label_url: this.state.label_url,
       denoised_image: this.state.denoised_image,
       image: this.state.image,
+      label_image: this.state.label_image,
       username: this.state.username
     });
     this.state.image.src = this.state.img_url;
   }
 
   handleLabelChange(event) {
+    this.state.label_image = new Image(48, 48);
+    this.state.label_image.src = this.state.label_url;
     this.setState({
       img_url: this.state.img_url,
       label_url: URL.createObjectURL(event.target.files[0]),
       denoised_image: this.state.denoised_image,
       image: this.state.image,
+      label_image: this.state.label_image,
       username: this.state.username
     });
+    this.state.label_image.src = this.state.label_url;
   }
 
   handleConvertClick() {
     this.state.image.src = this.state.img_url;
     const canvas = this.refs.canvas;
     const ctx = canvas.getContext("2d");
+    let ctx2 = null;
+    if (this.state.label_image !== null) {
+      this.state.label_image.src = this.state.label_url;
+      const canvas2 = this.refs.canvas2;
+      ctx2 = canvas2.getContext("2d");
+    }
     // const img = this.refs.image
     if (this.state.image !== null) {
       this.state.image.onload = () => {
@@ -66,16 +79,22 @@ class HomePage extends Component {
           let imgData = this.getArrayFromImage(
             ctx.getImageData(0, 0, 48, 48).data
           );
+          let labelData = null;
+          if (this.state.label_image !== null) {
+            labelData = this.getArrayFromImage(
+              ctx2.getImageData(0, 0, 48, 48).data
+            );
+          }
           // console.log(imgData);
-          this.sendDenoiseRequest(imgData);
+          this.sendDenoiseRequest(imgData, labelData);
         }
       };
     }
   }
 
-  sendDenoiseRequest(imgData) {
+  sendDenoiseRequest(imgData, labelData) {
     let config = { headers: { "Content-Type": "application/json" } };
-    let body = this.prepareData(imgData); // TODO: change
+    let body = this.prepareData(imgData, labelData); // TODO: change
     console.log(body);
     Axios.post("/predict", body, config)
       .then(results => {
@@ -114,12 +133,14 @@ class HomePage extends Component {
     ctx.putImageData(idata, 0, 0);
   }
 
-  prepareData(imgData) {
+  prepareData(imgData, labelData) {
     let body = {};
     body.username = this.state.username;
     body.images = {};
     body.images.img = imgData;
-    body.images.label = imgData;
+    if (labelData !== null) {
+      body.images.label = labelData;
+    }
     return body;
   }
 
@@ -138,8 +159,6 @@ class HomePage extends Component {
     }
     return data;
   }
-
-  getImageFromArray(array) {}
 
   create3DArray() {
     var array = new Array(48);
@@ -188,6 +207,7 @@ class HomePage extends Component {
         <div className="middle-column">
           <ConvertButtonContainer onClick={() => this.handleConvertClick()} />
           <canvas ref="canvas" width="48" height="48" />
+          <canvas ref="canvas2" width="48" height="48" />
         </div>
         <div className="right-column">
           <canvas ref="canvasLabel" />
