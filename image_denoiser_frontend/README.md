@@ -1,1 +1,0 @@
-# image-denoiser-frontend
